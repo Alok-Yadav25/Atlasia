@@ -1,0 +1,25 @@
+# Replace Q90 (Paris) with the Wikidata entity for the selected place.
+# Politicians, artists, musicians, actors, and poets born in the place.
+SELECT DISTINCT ?person ?personLabel ?occupationLabel ?partyLabel ?image ?article WHERE {
+  VALUES ?occupation {
+    wd:Q82955 wd:Q483501 wd:Q639669 wd:Q33999 wd:Q49757
+    wd:Q177220 wd:Q753110 wd:Q1028181 wd:Q1281618 wd:Q2526255
+  }
+  ?person wdt:P19 wd:Q90;
+          wdt:P106 ?occupation.
+
+  OPTIONAL { ?person wdt:P102 ?party. }
+  OPTIONAL { ?person wdt:P18 ?image. }
+  OPTIONAL {
+    ?article schema:about ?person;
+             schema:isPartOf <https://en.wikipedia.org/>.
+  }
+
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language "en".
+    ?person rdfs:label ?personLabel.
+    ?occupation rdfs:label ?occupationLabel.
+    ?party rdfs:label ?partyLabel.
+  }
+}
+LIMIT 48
