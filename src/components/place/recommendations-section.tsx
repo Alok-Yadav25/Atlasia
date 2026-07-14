@@ -14,10 +14,10 @@ function RecommendationCard({ place, label }: { place: RecommendedPlace; label: 
   const { data: media } = useSWR<{ photos: PlacePhoto[] }>(`/api/media?name=${encodeURIComponent(`${place.name}, ${place.country}`)}`, jsonFetcher, { revalidateOnFocus: false, dedupingInterval: 86_400_000 });
   const photo = media?.photos[0];
   return (
-    <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }}>
+    <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} whileHover={{ y: -8 }}>
       <Link href={`/?place=${encodeURIComponent(`${place.name}, ${place.country}`)}`}>
         <Card className="group relative aspect-[4/5] overflow-hidden border-white/10 bg-card">
-          {photo && <Image src={photo.thumbnailUrl} alt={`${place.name}, ${place.country}`} fill unoptimized sizes="(max-width: 640px) 80vw, 25vw" className="object-cover transition duration-700 group-hover:scale-105" />}
+          {photo && <Image src={photo.thumbnailUrl} alt={`${place.name}, ${place.country}`} fill unoptimized sizes="(max-width: 640px) 80vw, 25vw" className="object-cover transition duration-1000 ease-out group-hover:scale-[1.16]" />}
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.88))]" />
           <div className="absolute inset-x-0 top-0 flex justify-between p-4 text-white"><Badge className="border-white/10 bg-black/30 text-white backdrop-blur-xl">{label}</Badge><span className="grid size-8 place-items-center rounded-full bg-black/30 backdrop-blur-xl"><ArrowUpRight className="size-4" /></span></div>
           <div className="absolute inset-x-0 bottom-0 p-5 text-white"><p className="text-2xl font-semibold tracking-tight">{place.name}</p><p className="mt-1 text-xs text-white/60">{place.country} · {place.distanceKm.toLocaleString()} km</p><p className="mt-4 text-sm leading-6 text-white/72">{place.reason}</p></div>

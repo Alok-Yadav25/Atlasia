@@ -21,7 +21,7 @@ Click any screenshot to open that experience on the deployed website.
 ## What is already built
 
 - Local autocomplete backed by a generated 34,000-city GeoNames dataset—no third-party request per keystroke.
-- One aggregator endpoint: `GET /api/place?name=Jaipur, India`.
+- One aggregator endpoint: `GET /api/place?name=Tokyo, Japan`.
 - Parallel, isolated source adapters. A news or hotel failure never blocks weather, maps, or Wikipedia.
 - Seven-day cache through Supabase, with a process-memory fallback for zero-config local use.
 - Wikipedia place imagery plus weather-driven colour, glow, rain, snow, cloud, day, and night effects.
@@ -32,7 +32,9 @@ Click any screenshot to open that experience on the deployed website.
 - Rich city comparison across photos, weather, population, currency, language, attractions, cost, dishes, notable people, and nearby flora/fauna observations.
 - Nearby and similar-city recommendations plus food-destination suggestions with dynamically changing imagery.
 - Place-specific Wikimedia photo rotation plus scroll progress, reveal, orbit, card-stack, and editorial motion.
-- Working local itinerary cards with browser persistence and `.ics` calendar export.
+- A neutral Atlasia welcome experience with curated destinations, live photo cards, and no preselected city.
+- Two-step comparison that asks for both cities instead of silently choosing either side.
+- Budget- and stay-aware place recommendations alongside working local itinerary cards, browser persistence, and `.ics` calendar export.
 
 ## Project structure
 
@@ -185,14 +187,14 @@ Add the optional keys the same way. Never commit `.env.local` or `.vercel`.
 
 ## Feature routes
 
-- `/compare?place=...` compares photos, food, people, cost, flora/fauna, weather, languages, and attractions side by side.
+- `/compare?place=...&against=...` compares two explicitly selected cities across photos, food, people, cost, flora/fauna, weather, languages, and attractions.
 - `/travel?from=...&to=...` supports national and international route discovery, optional Amadeus flight samples, and honest provider handoffs for flights and trains.
 - `/photos?place=...` is a categorized, rotating Wikimedia visual atlas with a source-attributed lightbox.
 - `/traffic?place=...` shows TomTom live flow when configured and otherwise provides an explicitly labelled planning estimate plus live map handoffs.
 - `/stay`, `/food`, and `/essentials` use separately isolated OpenStreetMap queries so one timeout cannot empty every category.
 - `/culture` combines Wikimedia, Wikipedia, and Open Library discovery.
 - `/currency` converts live rates; `/translate` handles short practical phrases.
-- `/planner` stores itinerary cards locally and exports standard calendar files.
+- `/planner?place=...` recommends local and nearby stops from the available budget and stay length, stores itinerary cards locally, and exports standard calendar files.
 - `/events` uses Ticketmaster when configured and otherwise labels news-derived event leads clearly.
 - `/stories` combines current reporting with private, on-device traveler notes.
 

@@ -41,7 +41,7 @@ const routes = [
 ];
 
 interface FeatureNavProps {
-  place: string;
+  place?: string;
   searchValue?: string;
   onSearchValueChange?: (value: string) => void;
   onSearch?: (value: string) => void;
@@ -49,7 +49,7 @@ interface FeatureNavProps {
 }
 
 export function FeatureNav({
-  place,
+  place = "",
   searchValue,
   onSearchValueChange,
   onSearch,
@@ -71,7 +71,7 @@ export function FeatureNav({
       overlay ? "fixed inset-x-0 top-0 bg-black/24" : "sticky top-0 bg-[#070a10]/88"
     )}>
       <div className="mx-auto flex h-16 max-w-[92rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
-        <Link href={`/?place=${encodeURIComponent(place)}`} className="shrink-0">
+        <Link href={place ? `/?place=${encodeURIComponent(place)}` : "/"} className="shrink-0">
           <BrandMark />
         </Link>
         <SearchBar
@@ -87,7 +87,9 @@ export function FeatureNav({
         {routes.map((route) => {
           const Icon = route.icon;
           const active = pathname === route.href;
-          const href = route.href === "/" ? `/?place=${encodeURIComponent(place)}` : `${route.href}?place=${encodeURIComponent(place)}`;
+          const href = place
+            ? route.href === "/" ? `/?place=${encodeURIComponent(place)}` : `${route.href}?place=${encodeURIComponent(place)}`
+            : route.href;
           return (
             <Link
               key={route.href}

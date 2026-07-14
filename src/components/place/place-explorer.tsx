@@ -20,6 +20,7 @@ import { TransportSection } from "@/components/place/transport-section";
 import { TravelChat } from "@/components/place/travel-chat";
 import { VideosSection } from "@/components/place/videos-section";
 import { WeatherSection } from "@/components/place/weather-section";
+import { WelcomeExperience } from "@/components/place/welcome-experience";
 import { Button } from "@/components/ui/button";
 import { FeatureNav } from "@/components/explore/feature-nav";
 import type { PlaceData, WeatherData } from "@/types/place";
@@ -54,12 +55,12 @@ async function placeFetcher(url: string): Promise<PlaceData> {
   return body as PlaceData;
 }
 
-export function PlaceExplorer({ initialPlace = "Jaipur, India" }: { initialPlace?: string }) {
-  const [searchValue, setSearchValue] = useState(initialPlace);
-  const [activePlace, setActivePlace] = useState(initialPlace);
+export function PlaceExplorer({ initialPlace = null }: { initialPlace?: string | null }) {
+  const [searchValue, setSearchValue] = useState(initialPlace ?? "");
+  const [activePlace, setActivePlace] = useState(initialPlace ?? "");
   const { scrollYProgress } = useScroll();
   const { data, error, isLoading, isValidating, mutate } = useSWR<PlaceData>(
-    `/api/place?name=${encodeURIComponent(activePlace)}`,
+    activePlace ? `/api/place?name=${encodeURIComponent(activePlace)}` : null,
     placeFetcher,
     { keepPreviousData: true, revalidateOnFocus: false, dedupingInterval: 60_000 }
   );
@@ -71,6 +72,16 @@ export function PlaceExplorer({ initialPlace = "Jaipur, India" }: { initialPlace
     setActivePlace(next);
     window.history.replaceState(null, "", `/?place=${encodeURIComponent(next)}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  if (!activePlace) {
+    return (
+      <WelcomeExperience
+        searchValue={searchValue}
+        onSearchValueChange={setSearchValue}
+        onSearch={search}
+      />
+    );
   }
 
   if (isLoading && !data) return <DashboardSkeleton />;

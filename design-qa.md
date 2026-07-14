@@ -3,8 +3,8 @@
 ## Source of truth
 
 - Reference: conversation attachment, user-supplied Tokyo city-comparison screenshot.
-- Implementation: `/compare?place=Tokyo%2C%20Japan&against=Paris%2C%20France`.
-- Primary evidence: `.qa/compare-cards.png`, `.qa/compare-desktop-loaded.png`, `.qa/travel-desktop.png`, `.qa/photos-desktop-fixed.png`, and `.qa/traffic-desktop.png`.
+- Implementation: neutral `/` welcome, `/compare`, `/compare?place=Tokyo%2C%20Japan&against=Paris%2C%20France`, and `/planner?place=Tokyo%2C%20Japan`.
+- Primary evidence: `.qa/atlasia-welcome-desktop.png`, `.qa/atlasia-welcome-mobile.png`, `.qa/compare-desktop-loaded.png`, `.qa/travel-desktop.png`, `.qa/photos-desktop-fixed.png`, and `.qa/traffic-desktop.png`.
 - Viewports checked: desktop at 2048 × 1017 and 1440 × 1000; mobile at 390 × 844.
 - Tested state: Tokyo, Japan versus Paris, France, including delayed data-source completion.
 
@@ -18,12 +18,16 @@
 
 ## Interaction and state review
 
+- The root route opens on a centred Atlasia welcome state and makes no place request until a destination is chosen.
+- Autocomplete revealed Tokyo and related place matches while typing `tok`, with local data retained as a fallback.
+- Comparison starts with a first-city chooser, then asks for a second city without silently defaulting to Jaipur or another destination.
+- Planner recommendations react to stay length and total budget, and a recommended stop can be persisted into the calendar as an itinerary card.
 - Comparison loads two independent normalized place responses and preserves partial-source fallbacks.
 - Photo filters work; clicking a photo opens a source-attributed dialog and the close control works.
 - Travel search produces national/international route context and flight, train, and mixed-route provider handoffs.
 - Food imagery loads dynamically with no broken images in the tested Tokyo state.
 - Traffic renders a live TomTom state when configured or an explicitly labelled planning estimate otherwise.
-- Mobile document width matched the 390 px viewport on comparison and travel pages.
+- Mobile document width matched the 390 px viewport on the welcome, comparison, and travel pages.
 - Browser console contained no application errors in tested flows.
 
 ## Fix history

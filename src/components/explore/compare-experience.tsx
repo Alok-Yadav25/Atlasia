@@ -3,12 +3,14 @@
 import { FeaturePageShell, jsonFetcher } from "@/components/explore/feature-page-shell";
 import { SearchBar } from "@/components/place/search-bar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { GalleryData, NatureData, NearbyFeatureData, PlacePhoto } from "@/types/features";
 import type { PlaceData } from "@/types/place";
 import {
   ArrowRightLeft,
+  CircleDashed,
   CloudSun,
   Coins,
   Languages,
@@ -22,6 +24,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 
@@ -137,14 +140,26 @@ function ExtendedCompare({ primary, secondary }: { primary: PlaceData; secondary
 }
 
 function CompareBoard({ primary }: { primary: PlaceData }) {
-  const initialSecond = primary.overview.name.toLocaleLowerCase() === "tokyo" ? "Paris, France" : "Tokyo, Japan";
+  const searchParams = useSearchParams();
+  const initialSecond = searchParams.get("against")?.trim() ?? "";
   const [secondSearch, setSecondSearch] = useState(initialSecond);
   const [secondPlace, setSecondPlace] = useState(initialSecond);
   const { data: secondary, error, isLoading } = useSWR<PlaceData>(
-    `/api/place?name=${encodeURIComponent(secondPlace)}`,
+    secondPlace ? `/api/place?name=${encodeURIComponent(secondPlace)}` : null,
     jsonFetcher,
     { revalidateOnFocus: false, dedupingInterval: 60_000 }
   );
+
+  function chooseSecond(nextPlace: string) {
+    const next = nextPlace.trim();
+    if (next.length < 2) return;
+    setSecondSearch(next);
+    setSecondPlace(next);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("place", `${primary.overview.name}, ${primary.overview.country}`);
+    params.set("against", next);
+    window.history.replaceState(null, "", `/compare?${params.toString()}`);
+  }
 
   return (
     <div className="space-y-8">
@@ -154,11 +169,22 @@ function CompareBoard({ primary }: { primary: PlaceData }) {
           <CardTitle className="mt-3 text-2xl tracking-tight">Choose the other side</CardTitle>
         </CardHeader>
         <CardContent>
-          <SearchBar id="compare-second-place" value={secondSearch} onValueChange={setSecondSearch} onSearch={setSecondPlace} className="max-w-2xl" />
+          <SearchBar id="compare-second-place" value={secondSearch} onValueChange={setSecondSearch} onSearch={chooseSecond} className="max-w-2xl" />
         </CardContent>
       </Card>
 
-      {error && !secondary ? (
+      {!secondPlace ? (
+        <Card className="border-dashed bg-card/35">
+          <CardContent className="p-8 text-center sm:p-12">
+            <span className="mx-auto grid size-12 place-items-center rounded-full bg-primary/10 text-primary"><CircleDashed className="size-5" /></span>
+            <h2 className="mt-5 text-2xl font-semibold tracking-tight">Now choose a city to compare with {primary.overview.name}</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">No city is selected automatically. Pick the destination that matters to your trip.</p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              {["Tokyo, Japan", "Paris, France", "Cape Town, South Africa", "Barcelona, Spain"].filter((item) => !item.toLocaleLowerCase().startsWith(primary.overview.name.toLocaleLowerCase())).map((item) => <Button key={item} variant="outline" size="sm" className="rounded-full" onClick={() => chooseSecond(item)}>{item}</Button>)}
+            </div>
+          </CardContent>
+        </Card>
+      ) : error && !secondary ? (
         <Card><CardContent className="p-8 text-sm text-muted-foreground">The second city could not be loaded right now. Try another place or retry in a moment.</CardContent></Card>
       ) : isLoading || !secondary ? (
         <div className="grid gap-4"><Skeleton className="h-72" /><Skeleton className="h-40" /><Skeleton className="h-40" /></div>
