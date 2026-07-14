@@ -2,6 +2,22 @@
 
 Atlasia is a dynamic, weather-reactive place intelligence and trip-planning dashboard. Search a place and get its story, attractions, food, people, transport, traffic, map, photos, weather, currency, stays, news, videos, events, comparisons, route handoffs, and an in-context Groq travel companion.
 
+## Live deployment
+
+**[Explore Atlasia on Vercel →](https://atlasia-explorer.vercel.app)**
+
+The production deployment includes the server-side Groq, GNews, and YouTube integrations while keeping every API key private.
+
+## Screenshots
+
+Click any screenshot to open that experience on the deployed website.
+
+| City comparison | National and international travel |
+| --- | --- |
+| [![Atlasia city comparison showing Tokyo and Paris](docs/screenshots/atlasia-compare.png)](https://atlasia-explorer.vercel.app/compare?place=Tokyo%2C%20Japan) | [![Atlasia flight and train route search](docs/screenshots/atlasia-travel.png)](https://atlasia-explorer.vercel.app/travel?from=Tokyo%2C%20Japan&to=Paris%2C%20France) |
+| **Dynamic photo atlas** | **Traffic tracker** |
+| [![Atlasia destination photo atlas](docs/screenshots/atlasia-photos.png)](https://atlasia-explorer.vercel.app/photos?place=Tokyo%2C%20Japan) | [![Atlasia traffic tracker and live map handoffs](docs/screenshots/atlasia-traffic.png)](https://atlasia-explorer.vercel.app/traffic?place=Tokyo%2C%20Japan) |
+
 ## What is already built
 
 - Local autocomplete backed by a generated 34,000-city GeoNames dataset—no third-party request per keystroke.
