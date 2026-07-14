@@ -2,13 +2,14 @@
 
 import { BlurTitle } from "@/components/explore/blur-title";
 import { FeatureNav } from "@/components/explore/feature-nav";
+import { SearchBar } from "@/components/place/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { PlacePhoto } from "@/types/features";
 import type { PlaceData } from "@/types/place";
 import { AnimatePresence, motion, useScroll } from "motion/react";
-import { CloudSun, MapPin, Sparkles } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { ArrowRight, CloudSun, Globe2, MapPin, Sparkles } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import useSWR from "swr";
 
@@ -28,15 +29,18 @@ interface FeaturePageShellProps {
 
 export function FeaturePageShell({ eyebrow, title, description, children }: FeaturePageShellProps) {
   const searchParams = useSearchParams();
-  const place = searchParams.get("place")?.trim() || searchParams.get("from")?.trim() || "Jaipur, India";
+  const pathname = usePathname();
+  const router = useRouter();
+  const place = searchParams.get("place")?.trim() || searchParams.get("from")?.trim() || "";
+  const [selection, setSelection] = useState("");
   const { scrollYProgress } = useScroll();
   const { data, error, isLoading } = useSWR<PlaceData>(
-    `/api/place?name=${encodeURIComponent(place)}`,
+    place ? `/api/place?name=${encodeURIComponent(place)}` : null,
     jsonFetcher,
     { revalidateOnFocus: false, dedupingInterval: 60_000 }
   );
   const { data: media } = useSWR<{ photos: PlacePhoto[] }>(
-    `/api/media?name=${encodeURIComponent(data?.overview.name ?? place)}`,
+    place ? `/api/media?name=${encodeURIComponent(data?.overview.name ?? place)}` : null,
     jsonFetcher,
     { revalidateOnFocus: false, dedupingInterval: 86_400_000 }
   );
@@ -48,6 +52,35 @@ export function FeaturePageShell({ eyebrow, title, description, children }: Feat
     const timer = window.setInterval(() => setPhotoIndex((index) => (index + 1) % photos.length), 7_000);
     return () => window.clearInterval(timer);
   }, [photos.length]);
+
+  function choosePlace(nextPlace: string) {
+    const next = nextPlace.trim();
+    if (next.length < 2) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(pathname === "/travel" ? "from" : "place", next);
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  if (!place) {
+    return (
+      <main className="min-h-screen overflow-hidden bg-[#05070b] text-white">
+        <FeatureNav place="" />
+        <section className="relative isolate grid min-h-[calc(100vh-7rem)] place-items-center px-4 py-20 text-center sm:px-6">
+          <div className="pointer-events-none absolute inset-0 -z-20 bg-[radial-gradient(circle_at_50%_35%,rgba(34,211,238,.16),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(168,85,247,.1),transparent_25%),#05070b]" />
+          <div className="mx-auto w-full max-w-4xl">
+            <span className="mx-auto grid size-14 place-items-center rounded-full border border-white/10 bg-white/5 text-cyan-300"><Globe2 className="size-6" /></span>
+            <p className="mt-8 text-xs font-semibold tracking-[0.26em] text-cyan-300 uppercase">{eyebrow}</p>
+            <h1 className="mt-4 text-balance text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl">Start with a place, then let Atlasia connect the rest.</h1>
+            <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-7 text-white/55 sm:text-lg">{description}</p>
+            <div className="mx-auto mt-10 max-w-2xl"><SearchBar id={`feature-place-${pathname.replaceAll("/", "-") || "home"}`} value={selection} onValueChange={setSelection} onSearch={choosePlace} /></div>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {["Tokyo, Japan", "Paris, France", "Cape Town, South Africa", "Barcelona, Spain"].map((item) => <button key={item} type="button" onClick={() => choosePlace(item)} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/58 transition hover:border-white/25 hover:bg-white/10 hover:text-white">{item}<ArrowRight className="size-3" /></button>)}
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   if (error && !data) {
     return (

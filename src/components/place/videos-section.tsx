@@ -16,7 +16,7 @@ export function VideosSection({ videos, configured }: VideosSectionProps) {
           {videos.slice(0, 4).map((video) => (
             <a key={video.id} href={video.url} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-xl border border-border/65 bg-muted/25">
               <div className="relative aspect-video overflow-hidden">
-                <Image src={video.thumbnailUrl} alt="" fill unoptimized sizes="(max-width: 640px) 100vw, 360px" className="object-cover transition duration-500 group-hover:scale-105" />
+                <Image src={video.thumbnailUrl} alt="" fill unoptimized sizes="(max-width: 640px) 100vw, 360px" className="object-cover transition duration-900 ease-out group-hover:scale-[1.14]" />
                 <span className="absolute inset-0 grid place-items-center bg-black/15 transition group-hover:bg-black/30">
                   <span className="grid size-10 place-items-center rounded-full bg-white text-black shadow-xl"><Play className="ml-0.5 size-4 fill-current" /></span>
                 </span>

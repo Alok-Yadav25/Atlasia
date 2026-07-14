@@ -62,7 +62,18 @@ export function SearchBar({
       .slice(0, 7)
       .map(({ city }) => city);
   }, [normalized]);
-  const suggestions = normalized ? data?.suggestions ?? localSuggestions : localSuggestions;
+  const suggestions = useMemo(() => {
+    const combined = normalized
+      ? [...(data?.suggestions ?? []), ...localSuggestions]
+      : localSuggestions;
+    const seen = new Set<string>();
+    return combined.filter((city) => {
+      const key = `${city.name}-${city.countryCode}`.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 8);
+  }, [data?.suggestions, localSuggestions, normalized]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -109,6 +120,8 @@ export function SearchBar({
         <Input
           id={id}
           autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
           role="combobox"
           aria-autocomplete="list"
           aria-controls={`${id}-suggestions`}
@@ -117,7 +130,7 @@ export function SearchBar({
             "h-auto flex-1 border-0 bg-transparent text-white shadow-none placeholder:text-white/55 focus-visible:ring-0 dark:bg-transparent",
             compact ? "px-2 text-sm" : "px-3 text-base sm:text-lg"
           )}
-          placeholder={compact ? "Search another place" : "Where do you want to go?"}
+          placeholder={compact ? (value ? "Search another place" : "Search a city or place") : "Where do you want to go?"}
           value={value}
           onChange={(event) => {
             onValueChange(event.target.value);
@@ -149,7 +162,7 @@ export function SearchBar({
             <CommandEmpty className="px-4 py-5 text-left text-sm text-muted-foreground">
               No local suggestion—press Enter to search the world.
             </CommandEmpty>
-            <CommandGroup heading={normalized ? "Matching places" : "Popular right now"}>
+            <CommandGroup heading={normalized ? "Matching cities and places" : "Popular destinations"}>
               {suggestions.map((city) => {
                 const fullName = `${city.name}, ${city.country}`;
                 return (

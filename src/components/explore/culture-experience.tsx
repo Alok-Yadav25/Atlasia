@@ -16,7 +16,7 @@ function MediaCard({ item, index }: { item: CultureItem; index: number }) {
   return (
     <motion.article initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index, 6) * 0.04 }} viewport={{ once: true }}>
       <Card className="group h-full overflow-hidden bg-card/72">
-        {item.imageUrl && <div className="h-52 bg-cover bg-center transition duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${item.imageUrl})` }} />}
+        {item.imageUrl && <div className="h-52 bg-cover bg-center transition duration-1000 ease-out group-hover:scale-[1.14]" style={{ backgroundImage: `url(${item.imageUrl})` }} />}
         <CardContent className="p-5"><Badge variant="outline">{item.kind === "movie" ? <Film className="size-3" /> : <BookOpenText className="size-3" />}{item.kind}</Badge><h3 className="mt-4 text-xl font-semibold tracking-tight">{item.title}</h3><p className="mt-2 text-xs text-muted-foreground">{item.byline}{item.year ? ` · ${item.year}` : ""}</p><p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">{item.description}</p><Button asChild variant="ghost" className="mt-4 px-0"><a href={item.url} target="_blank" rel="noreferrer">Open source <ExternalLink className="size-3.5" /></a></Button></CardContent>
       </Card>
     </motion.article>
